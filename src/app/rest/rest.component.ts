@@ -10,7 +10,7 @@ import { FormControl, FormGroup } from '@angular/forms';
 })
 
 export class RestComponent {
-  url: string = "https://192.168.83.31/";
+  url: string = "https://localhost:7035/";
   http = inject(HttpClient);
   contacts$ = this.getContacts();
   selectedUserId: string | null = null;
