@@ -13,6 +13,7 @@ export class RestComponent {
   http = inject(HttpClient);
   contacts$ = this.getContacts();
   selectedUserId: string | null = null;
+  url = "https://192.168.83.31/";
 
   contactsForm = new FormGroup({
     name: new FormControl<string>(''),
@@ -42,7 +43,7 @@ export class RestComponent {
 
     if (this.selectedUserId) {
       // Actualizar usuario existente
-      this.http.put(`https://localhost:7035/api/Account/Update/${this.selectedUserId}`, userData, { responseType: 'text' })
+      this.http.put(this.url + `api/Account/Update/${this.selectedUserId}`, userData, { responseType: 'text' })
         .subscribe({
           next: (value) => {
             console.log('User updated successfully', value);
@@ -58,7 +59,7 @@ export class RestComponent {
         });
     } else {
       // Crear nuevo usuario
-      this.http.post('https://localhost:7035/api/Account/Register', userData, { responseType: 'text' })
+      this.http.post(this.url + 'api/Account/Register', userData, { responseType: 'text' })
         .subscribe({
           next: (value) => {
             console.log('User added successfully', value);
@@ -76,7 +77,7 @@ export class RestComponent {
   onDelete(id: string) {
     const confirmDelete = confirm('¿Estás seguro de que deseas eliminar este usuario?');
     if (confirmDelete) {
-      this.http.delete(`https://localhost:7035/api/Account/Delete/${id}`, { responseType: 'text' })
+      this.http.delete(this.url + `api/Account/Delete/${id}`, { responseType: 'text' })
       .subscribe({
         next: (value) => {
           console.log('User deleted successfully', value);
@@ -93,7 +94,7 @@ export class RestComponent {
 
   onUpdate(id: string) {
     // Busca los datos del usuario seleccionado
-    this.http.get<any>(`https://localhost:7035/api/Account/GetUser/${id}`)
+    this.http.get<any>(this.url + `api/Account/GetUser/${id}`)
       .subscribe({
         next: (user) => {
           console.log('User data loaded for update', user);
@@ -122,6 +123,6 @@ export class RestComponent {
   //     return this.http.get<Contact[]>('https://localhost:7035/api/Account/Users');
   // }
   private getContacts(): Observable<any> {
-    return this.http.get('https://localhost:7035/api/Account/Users');
+    return this.http.get(this.url + 'api/Account/Users');
   }
 }
