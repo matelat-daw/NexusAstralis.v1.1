@@ -13,7 +13,7 @@ export class RestComponent {
   http = inject(HttpClient);
   contacts$ = this.getContacts();
   selectedUserId: string | null = null;
-  url = "https://192.168.83.31/";
+  url: string = "https://192.168.83.31/";
 
   contactsForm = new FormGroup({
     name: new FormControl<string>(''),
