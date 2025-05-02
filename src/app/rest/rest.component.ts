@@ -15,7 +15,44 @@ export class RestComponent {
   contacts$ = this.getContacts();
   selectedUserId: string | null = null;
 
-  contactsForm = new FormGroup({
+  loginFrom = new FormGroup({
+    email: new FormControl<string>(''),
+    pass: new FormControl<string>('')
+  });
+
+  onLoginFormSubmit() {
+    const loginData = {
+      Email: this.loginFrom.value.email,
+      Password: this.loginFrom.value.pass
+    };
+    console.log(loginData);
+    this.http.post(this.url + 'api/Account/Login', loginData, { responseType: 'text' })
+      .subscribe({
+        next: (value) => {
+          console.log('Login successful', value);
+          alert('Login successful');
+        },
+        error: (error) => {
+          console.error('Login error', error);
+          alert('Login error');
+        }
+      });
+  }
+  onLogout() {
+    this.http.post(this.url + 'api/Account/Logout', {}, { responseType: 'text' })
+      .subscribe({
+        next: (value) => {
+          console.log('Logout successful', value);
+          alert('Logout successful');
+        },
+        error: (error) => {
+          console.error('Logout error', error);
+          alert('Logout error');
+        }
+      });
+  }
+
+  registerForm = new FormGroup({
     name: new FormControl<string>(''),
     surname1: new FormControl<string>(''),
     surname2: new FormControl<string>(''),
@@ -27,29 +64,35 @@ export class RestComponent {
     image: new FormControl<string | null>(null)
   });
 
-  onFormSubmit() {
+  onRegisterFormSubmit() {
     const userData = {
-      Name: this.contactsForm.value.name,
-      Surname1: this.contactsForm.value.surname1,
-      Surname2: this.contactsForm.value.surname2,
-      Bday: this.contactsForm.value.bday,
-      PhoneNumber: this.contactsForm.value.phoneNumber,
-      Email: this.contactsForm.value.email,
-      Password: this.contactsForm.value.pass,
-      Password2: this.contactsForm.value.pass2,
-      ProfileImageFile: this.contactsForm.value.image
+      Name: this.registerForm.value.name,
+      Surname1: this.registerForm.value.surname1,
+      Surname2: this.registerForm.value.surname2,
+      Bday: this.registerForm.value.bday,
+      PhoneNumber: this.registerForm.value.phoneNumber,
+      Email: this.registerForm.value.email,
+      Password: this.registerForm.value.pass,
+      Password2: this.registerForm.value.pass2,
+      ProfileImageFile: this.registerForm.value.image
     };
-    console.log(userData);
+    // console.log(userData);
 
+    if (this.registerForm.value.pass !== this.registerForm.value.pass2) {
+      alert('Las contraseñas no coinciden');
+      return;
+    }
     if (this.selectedUserId) {
       // Actualizar usuario existente
-      this.http.put(`${this.url}api/Account/Update/${this.selectedUserId}`, userData, { responseType: 'text' })
+      console.log('Updating user :', userData);
+      this.http.patch(`${this.url}api/Account/Update/${this.selectedUserId}`, userData, { responseType: 'text' })
+      //this.http.patch(this.url + 'api/Account/Update/' + this.selectedUserId, userData, { responseType: 'text' })
         .subscribe({
           next: (value) => {
             console.log('User updated successfully', value);
             alert('Usuario actualizado con éxito');
             this.contacts$ = this.getContacts(); // Refresca la lista de contactos
-            this.contactsForm.reset(); // Resetea el formulario
+            this.registerForm.reset(); // Resetea el formulario
             this.selectedUserId = null; // Limpia el ID seleccionado
           },
           error: (error) => {
@@ -64,7 +107,7 @@ export class RestComponent {
           next: (value) => {
             console.log('User added successfully', value);
             this.contacts$ = this.getContacts(); // Refresca la lista de contactos
-            this.contactsForm.reset(); // Resetea el formulario
+            this.registerForm.reset(); // Resetea el formulario
           },
           error: (error) => {
             console.error('Error adding user', error);
@@ -100,7 +143,7 @@ export class RestComponent {
           console.log('User data loaded for update', user);
           this.selectedUserId = id; // Guarda el ID del usuario seleccionado
           // Rellena el formulario con los datos del usuario
-          this.contactsForm.patchValue({
+          this.registerForm.patchValue({
             name: user.name,
             surname1: user.surname1,
             surname2: user.surname2,
@@ -119,9 +162,11 @@ export class RestComponent {
       });
   }
 
-  //   private getContacts(): Observable<Contact[]> {
-  //     return this.http.get<Contact[]>('https://localhost:7035/api/Account/Users');
-  // }
+  onRegister()
+  {
+    window.location.href = 'Register.html';
+  }
+
   private getContacts(): Observable<any> {
     return this.http.get(this.url + 'api/Account/Users');
   }
